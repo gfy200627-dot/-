@@ -1,0 +1,135 @@
+/* ==========================================================================
+   AutoInsight Design Tokens
+   设计基调：深色蓝黑底 + 层次面板 + 科技蓝 / 新能源绿 强调色
+   所有颜色以 CSS 变量暴露，禁止在业务组件里写裸色值
+   ========================================================================== */
+
+:root {
+  /* ---------- 层级背景（深色底 + 浅层次，不使用纯黑） ---------- */
+  --ai-bg-base: #0b0f16;        // 应用最底层
+  --ai-bg-page: #0e141d;        // 页面底色
+  --ai-bg-panel: #131a24;       // 面板 / 卡片
+  --ai-bg-elevated: #182130;    // 悬浮 / 弹层
+  --ai-bg-hover: #1d2836;
+  --ai-bg-active: #22303f;
+  --ai-bg-subtle: rgba(255, 255, 255, 0.03);
+  --ai-bg-mask: rgba(6, 9, 14, 0.72);
+
+  /* ---------- 边框 ---------- */
+  --ai-border: rgba(255, 255, 255, 0.08);
+  --ai-border-strong: rgba(255, 255, 255, 0.14);
+  --ai-border-brand: rgba(46, 124, 246, 0.42);
+  --ai-border-dashed: rgba(255, 255, 255, 0.12);
+
+  /* ---------- 文本 ---------- */
+  --ai-text-1: #e6edf6;         // 主文本
+  --ai-text-2: #9fb0c6;         // 次级文本
+  --ai-text-3: #6b7c93;         // 弱文本 / 轴标签
+  --ai-text-4: #4b5a6e;         // 占位
+  --ai-text-inverse: #0b0f16;
+
+  /* ---------- 品牌与强调色 ---------- */
+  --ai-brand: #2e7cf6;          // 科技蓝
+  --ai-brand-hover: #4a8ff8;
+  --ai-brand-active: #246ade;
+  --ai-brand-soft: rgba(46, 124, 246, 0.14);
+  --ai-brand-ghost: rgba(46, 124, 246, 0.08);
+
+  --ai-nev: #16c79a;            // 新能源绿
+  --ai-nev-soft: rgba(22, 199, 154, 0.14);
+  --ai-warn: #f5a524;           // 警告橙
+  --ai-warn-soft: rgba(245, 165, 36, 0.14);
+  --ai-danger: #f5544b;         // 危险红
+  --ai-danger-soft: rgba(245, 84, 75, 0.14);
+  --ai-info: #6b8cff;
+  --ai-purple: #9a7bff;
+  --ai-cyan: #35c4d8;
+
+  /* ---------- 图表色板（顺序即图例顺序） ---------- */
+  --ai-chart-1: #2e7cf6;
+  --ai-chart-2: #16c79a;
+  --ai-chart-3: #f5a524;
+  --ai-chart-4: #9a7bff;
+  --ai-chart-5: #35c4d8;
+  --ai-chart-6: #f5544b;
+  --ai-chart-7: #4fd1c5;
+  --ai-chart-8: #8a94ff;
+
+  --ai-chart-axis: rgba(255, 255, 255, 0.12);
+  --ai-chart-split: rgba(255, 255, 255, 0.06);
+  --ai-chart-label: #6b7c93;
+
+  /* ---------- 语义色 ---------- */
+  --ai-up: #f5544b;             // 中国习惯：涨=红
+  --ai-down: #16c79a;           // 跌=绿
+
+  /* ---------- 圆角规范 ---------- */
+  --ai-radius-xs: 3px;
+  --ai-radius-sm: 6px;
+  --ai-radius-md: 10px;
+  --ai-radius-lg: 14px;
+  --ai-radius-xl: 20px;
+  --ai-radius-pill: 999px;
+
+  /* ---------- 间距系统（4pt） ---------- */
+  --ai-space-1: 4px;
+  --ai-space-2: 8px;
+  --ai-space-3: 12px;
+  --ai-space-4: 16px;
+  --ai-space-5: 20px;
+  --ai-space-6: 24px;
+  --ai-space-8: 32px;
+  --ai-space-10: 40px;
+  --ai-space-12: 48px;
+
+  /* ---------- 阴影 ---------- */
+  --ai-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28);
+  --ai-shadow-md: 0 6px 18px rgba(0, 0, 0, 0.32);
+  --ai-shadow-lg: 0 18px 48px rgba(0, 0, 0, 0.42);
+  --ai-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --ai-shadow-glow: 0 0 0 1px rgba(46, 124, 246, 0.28), 0 10px 30px rgba(46, 124, 246, 0.16);
+
+  /* ---------- 字体 ---------- */
+  --ai-font-sans: 'Inter', 'HarmonyOS Sans SC', 'PingFang SC', 'Microsoft YaHei',
+    system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ai-font-mono: 'JetBrains Mono', 'SFMono-Regular', 'Roboto Mono', Consolas, monospace;
+
+  --ai-fs-display: 34px;
+  --ai-fs-h1: 26px;
+  --ai-fs-h2: 20px;
+  --ai-fs-h3: 16px;
+  --ai-fs-body: 14px;
+  --ai-fs-sm: 13px;
+  --ai-fs-xs: 12px;
+  --ai-fs-mini: 11px;
+
+  --ai-fw-normal: 400;
+  --ai-fw-medium: 500;
+  --ai-fw-semibold: 600;
+  --ai-fw-bold: 700;
+
+  --ai-lh-tight: 1.2;
+  --ai-lh-normal: 1.5;
+  --ai-lh-loose: 1.75;
+
+  /* ---------- 布局尺寸 ---------- */
+  --ai-header-height: 60px;
+  --ai-sidebar-width: 216px;
+  --ai-sidebar-collapsed: 64px;
+  --ai-content-max: 1680px;
+
+  /* ---------- 动效（克制） ---------- */
+  --ai-duration-fast: 120ms;
+  --ai-duration-base: 200ms;
+  --ai-duration-slow: 320ms;
+  --ai-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---------- 层级 ---------- */
+  --ai-z-base: 1;
+  --ai-z-sticky: 100;
+  --ai-z-header: 200;
+  --ai-z-sidebar: 300;
+  --ai-z-overlay: 400;
+  --ai-z-modal: 500;
+  --ai-z-toast: 600;
+}
