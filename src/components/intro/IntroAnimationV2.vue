@@ -47,8 +47,10 @@ function buildCar(){
 }
 
 function makeParticles(){
-  const n=4000,c=document.createElement('canvas');c.width=1800;c.height=360;const ctx=c.getContext('2d')!;ctx.fillStyle='#fff';ctx.font='700 235px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('AutoInsight',900,180);const data=ctx.getImageData(0,0,c.width,c.height).data,pts:Array<[number,number]>=[]
+  const n=4000,c=document.createElement('canvas');c.width=1800;c.height=360;const ctx=c.getContext('2d')!;ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle='#fff';ctx.font='700 235px Arial,sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('AutoInsight',900,180);const data=ctx.getImageData(0,0,c.width,c.height).data,pts:Array<[number,number]>=[]
   for(let y=0;y<c.height;y+=3)for(let x=0;x<c.width;x+=3)if(data[(y*c.width+x)*4+3]>80)pts.push([x,y])
+  // 某些浏览器/隐私模式下 canvas 文字采样可能得到空数组，不能因此让整个 3D 开场初始化失败。
+  if(!pts.length){for(let i=0;i<900;i++){const a=(i/900)*Math.PI*2;pts.push([900+Math.cos(a)*760,180+Math.sin(a)*95])}}
   from=new Float32Array(n*3);to=new Float32Array(n*3);let seed=9187;const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
   for(let i=0;i<n;i++){const a=rnd()*Math.PI*2,b=Math.acos(2*rnd()-1),q=Math.pow(rnd(),.4);from[i*3]=Math.cos(a)*Math.sin(b)*q*4;from[i*3+1]=Math.cos(b)*q*2.3+.35;from[i*3+2]=Math.sin(a)*Math.sin(b)*q*6;const p=pts[(i*43)%pts.length];to[i*3]=.05;to[i*3+1]=-(p[1]-180)/360*2.6;to[i*3+2]=-(p[0]-900)/1800*10.5}
   const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.BufferAttribute(from.slice(),3));particleMaterial=new THREE.PointsMaterial({color:0xffffff,size:.024,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false});particles=new THREE.Points(geo,particleMaterial);particles.frustumCulled=false;particles.visible=false;scene!.add(particles)
