@@ -1,34 +1,33 @@
 <template>
-  <div ref="root" class="intro" aria-label="AutoInsight 开场动画" role="presentation">
-    <div ref="scene" class="intro__scene">
-      <div ref="roadLine" class="intro__road-line" aria-hidden="true"></div>
+  <div class="intro" :class="{ 'intro--running': running, 'intro--done': done }" aria-label="AutoInsight 开场动画" role="presentation">
+    <div class="intro__scene">
+      <div class="intro__road-line" aria-hidden="true"></div>
 
-      <div ref="sideWrap" class="intro__car intro__car--side">
+      <div class="intro__car intro__car--side" aria-hidden="true">
         <img :src="carSide" alt="" draggable="false" />
       </div>
 
-      <div ref="frontWrap" class="intro__car intro__car--front">
+      <div class="intro__car intro__car--front" aria-hidden="true">
         <img :src="carFront" alt="" draggable="false" />
       </div>
 
-      <div ref="streak" class="intro__streak" aria-hidden="true"></div>
+      <div class="intro__streak" aria-hidden="true"></div>
     </div>
 
-    <div ref="brand" class="intro__brand" aria-hidden="true">
+    <div class="intro__brand" aria-hidden="true">
       <div class="intro__wordmark">AutoInsight</div>
       <div class="intro__rule"></div>
       <div class="intro__tagline">汽车行业数据智能分析与决策平台</div>
     </div>
 
-    <button ref="skip" class="intro__skip" type="button" @click="skipAnimation">
+    <button class="intro__skip" type="button" @click="skipAnimation">
       跳过 <span>SKIP</span>
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
-import { gsap } from 'gsap'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import carSide from '@/assets/intro/car-side.svg'
 import carFront from '@/assets/intro/car-front.svg'
 
@@ -36,166 +35,40 @@ const emit = defineEmits<{
   complete: []
 }>()
 
-const root = ref<HTMLElement | null>(null)
-const scene = ref<HTMLElement | null>(null)
-const sideWrap = ref<HTMLElement | null>(null)
-const frontWrap = ref<HTMLElement | null>(null)
-const streak = ref<HTMLElement | null>(null)
-const roadLine = ref<HTMLElement | null>(null)
-const brand = ref<HTMLElement | null>(null)
-const skip = ref<HTMLButtonElement | null>(null)
-
-let timeline: gsap.core.Timeline | null = null
-let completed = false
+const running = ref(false)
+const done = ref(false)
+let timer: number | undefined
+let finished = false
 
 function finish() {
-  if (completed) return
-  completed = true
-  timeline?.kill()
-  gsap.killTweensOf([root.value, scene.value, sideWrap.value, frontWrap.value, streak.value, roadLine.value, brand.value])
-  emit('complete')
+  if (finished) return
+  finished = true
+  if (timer) window.clearTimeout(timer)
+  done.value = true
+  window.setTimeout(() => emit('complete'), 320)
 }
 
 function skipAnimation() {
-  if (!root.value) return
-  gsap.to(root.value, {
-    opacity: 0,
-    duration: 0.28,
-    ease: 'power2.in',
-    onComplete: finish,
-  })
+  finish()
 }
 
-function createTimeline() {
-  if (!root.value || !scene.value || !sideWrap.value || !frontWrap.value || !streak.value || !roadLine.value || !brand.value) return
-
+onMounted(() => {
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   if (reducedMotion) {
-    gsap.set(sideWrap.value, { autoAlpha: 0 })
-    gsap.set(frontWrap.value, { autoAlpha: 0 })
-    gsap.set(brand.value, { autoAlpha: 1 })
-    gsap.set(brand.value.querySelector('.intro__wordmark'), { scale: 1, letterSpacing: '0.08em' })
-    window.setTimeout(finish, 500)
+    timer = window.setTimeout(finish, 450)
     return
   }
 
-  gsap.set(root.value, { opacity: 1 })
-  gsap.set(sideWrap.value, {
-    xPercent: -128,
-    yPercent: 7,
-    scale: 0.38,
-    rotationY: 0,
-    rotationZ: -1.5,
-    autoAlpha: 1,
+  requestAnimationFrame(() => {
+    running.value = true
   })
-  gsap.set(frontWrap.value, {
-    x: 0,
-    y: 0,
-    scale: 0.42,
-    rotationY: -8,
-    autoAlpha: 0,
-  })
-  gsap.set(streak.value, { scaleX: 0, scaleY: 0.7, autoAlpha: 0 })
-  gsap.set(roadLine.value, { scaleX: 0, autoAlpha: 0 })
-  gsap.set(brand.value, { autoAlpha: 0, scale: 0.92 })
-  gsap.set(brand.value.querySelector('.intro__wordmark'), { scaleX: 0.42, letterSpacing: '0.34em' })
-  gsap.set(brand.value.querySelector('.intro__rule'), { scaleX: 0 })
-  gsap.set(brand.value.querySelector('.intro__tagline'), { y: 12, autoAlpha: 0 })
 
-  timeline = gsap.timeline({ onComplete: finish })
-
-  timeline
-    .to(roadLine.value, { autoAlpha: 0.45, scaleX: 1, duration: 0.5, ease: 'power2.out' }, 0.05)
-    .to(sideWrap.value, {
-      xPercent: -3,
-      yPercent: 0,
-      scale: 0.52,
-      duration: 1.18,
-      ease: 'power3.out',
-    }, 0.18)
-    .to(sideWrap.value, {
-      xPercent: 0,
-      scale: 0.58,
-      rotationY: 72,
-      rotationZ: 0,
-      duration: 0.58,
-      ease: 'power2.inOut',
-    }, 1.36)
-    .to(sideWrap.value, { autoAlpha: 0, duration: 0.08 }, 1.88)
-    .to(frontWrap.value, {
-      autoAlpha: 1,
-      scale: 0.56,
-      rotationY: 0,
-      duration: 0.22,
-      ease: 'power2.out',
-    }, 1.84)
-    .to(frontWrap.value, {
-      scale: 0.73,
-      duration: 0.28,
-      ease: 'power2.in',
-    }, 2.02)
-    .to(streak.value, {
-      autoAlpha: 0.7,
-      scaleX: 1,
-      duration: 0.18,
-      ease: 'power4.out',
-    }, 2.12)
-    .to(frontWrap.value, {
-      scale: 5.8,
-      y: 10,
-      duration: 0.74,
-      ease: 'power4.in',
-    }, 2.16)
-    .to(root.value, { backgroundColor: '#ffffff', duration: 0.02 }, 2.72)
-    .to(frontWrap.value, {
-      scaleX: 13,
-      scaleY: 0.18,
-      filter: 'blur(2px)',
-      autoAlpha: 0,
-      duration: 0.34,
-      ease: 'power3.inOut',
-    }, 2.7)
-    .to(streak.value, {
-      scaleX: 1.7,
-      scaleY: 1.8,
-      autoAlpha: 0,
-      duration: 0.42,
-      ease: 'power3.out',
-    }, 2.72)
-    .to(roadLine.value, { autoAlpha: 0, duration: 0.2 }, 2.72)
-    .to(brand.value, {
-      autoAlpha: 1,
-      scale: 1,
-      duration: 0.28,
-      ease: 'power2.out',
-    }, 2.98)
-    .to(brand.value.querySelector('.intro__wordmark'), {
-      scaleX: 1,
-      letterSpacing: '0.08em',
-      duration: 0.68,
-      ease: 'power3.out',
-    }, 2.98)
-    .to(brand.value.querySelector('.intro__rule'), {
-      scaleX: 1,
-      duration: 0.42,
-      ease: 'power2.out',
-    }, 3.22)
-    .to(brand.value.querySelector('.intro__tagline'), {
-      y: 0,
-      autoAlpha: 0.62,
-      duration: 0.38,
-      ease: 'power2.out',
-    }, 3.36)
-    .to(brand.value, { autoAlpha: 0, duration: 0.34, delay: 0.55, ease: 'power2.in' })
-}
-
-onMounted(async () => {
-  await nextTick()
-  createTimeline()
+  // 约 4.35 秒完成：驶入 → 转向正面 → 冲屏 → 字标显现。
+  timer = window.setTimeout(finish, 4350)
 })
 
 onBeforeUnmount(() => {
-  timeline?.kill()
+  if (timer) window.clearTimeout(timer)
 })
 </script>
 
@@ -209,6 +82,10 @@ onBeforeUnmount(() => {
   color: #050505;
   font-family: Inter, "Helvetica Neue", Arial, sans-serif;
   isolation: isolate;
+}
+
+.intro--done {
+  animation: introExit 320ms ease-in forwards;
 }
 
 .intro__scene {
@@ -226,6 +103,7 @@ onBeforeUnmount(() => {
   transform-style: preserve-3d;
   transform-origin: center center;
   pointer-events: none;
+  opacity: 0;
   will-change: transform, opacity, filter;
 }
 
@@ -248,6 +126,14 @@ onBeforeUnmount(() => {
   margin-top: min(-13vw, -195px);
 }
 
+.intro--running .intro__car--side {
+  animation: carSide 1.9s cubic-bezier(.18,.75,.28,1) forwards;
+}
+
+.intro--running .intro__car--front {
+  animation: carFront 1.55s cubic-bezier(.16,.82,.22,1) 1.82s forwards;
+}
+
 .intro__road-line {
   position: absolute;
   left: 12%;
@@ -255,9 +141,13 @@ onBeforeUnmount(() => {
   top: 71%;
   height: 1px;
   background: #050505;
+  transform: scaleX(0);
   transform-origin: center;
-  opacity: 0.4;
-  will-change: transform, opacity;
+  opacity: 0;
+}
+
+.intro--running .intro__road-line {
+  animation: roadLine 2.75s ease-out forwards;
 }
 
 .intro__streak {
@@ -271,8 +161,12 @@ onBeforeUnmount(() => {
   border-radius: 999px;
   background: #050505;
   filter: blur(16px);
-  transform-origin: center;
-  will-change: transform, opacity;
+  transform: scaleX(0) scaleY(.7);
+  opacity: 0;
+}
+
+.intro--running .intro__streak {
+  animation: streak 0.82s cubic-bezier(.12,.8,.22,1) 2.1s forwards;
 }
 
 .intro__brand {
@@ -280,18 +174,28 @@ onBeforeUnmount(() => {
   left: 50%;
   top: 50%;
   width: min(88vw, 1100px);
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%) scale(.92);
   text-align: center;
-  will-change: transform, opacity;
+  opacity: 0;
+}
+
+.intro--running .intro__brand {
+  animation: brand 1.15s cubic-bezier(.2,.75,.25,1) 2.95s forwards;
 }
 
 .intro__wordmark {
   font-size: clamp(48px, 8vw, 116px);
   font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: 0.08em;
-  transform-origin: center;
+  line-height: .95;
+  letter-spacing: .34em;
+  padding-left: .34em;
   white-space: nowrap;
+  transform: scaleX(.42);
+  transform-origin: center;
+}
+
+.intro--running .intro__wordmark {
+  animation: wordmark 720ms cubic-bezier(.18,.78,.24,1) 2.96s forwards;
 }
 
 .intro__rule {
@@ -299,14 +203,25 @@ onBeforeUnmount(() => {
   height: 1px;
   margin: 24px auto 18px;
   background: #050505;
+  transform: scaleX(0);
   transform-origin: center;
+}
+
+.intro--running .intro__rule {
+  animation: rule 420ms ease-out 3.24s forwards;
 }
 
 .intro__tagline {
   font-size: clamp(11px, 1.05vw, 15px);
   font-weight: 400;
-  letter-spacing: 0.28em;
-  padding-left: 0.28em;
+  letter-spacing: .28em;
+  padding-left: .28em;
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+.intro--running .intro__tagline {
+  animation: tagline 380ms ease-out 3.4s forwards;
 }
 
 .intro__skip {
@@ -318,52 +233,96 @@ onBeforeUnmount(() => {
   background: transparent;
   color: #111;
   font-size: 11px;
-  letter-spacing: 0.18em;
+  letter-spacing: .18em;
   cursor: pointer;
-  opacity: 0.52;
+  opacity: .52;
   transition: opacity 160ms ease;
 }
 
 .intro__skip span {
   margin-left: 7px;
   font-size: 9px;
-  opacity: 0.55;
+  opacity: .55;
 }
 
-.intro__skip:hover {
-  opacity: 1;
+.intro__skip:hover { opacity: 1; }
+
+@keyframes carSide {
+  0% { opacity: 0; transform: translateX(-128%) translateY(7%) scale(.38) rotateY(0deg) rotateZ(-1.5deg); }
+  8% { opacity: 1; }
+  62% { opacity: 1; transform: translateX(-3%) translateY(0) scale(.52) rotateY(0deg) rotateZ(0deg); }
+  91% { opacity: 1; transform: translateX(0) translateY(0) scale(.58) rotateY(72deg) rotateZ(0deg); }
+  100% { opacity: 0; transform: translateX(0) translateY(0) scale(.58) rotateY(90deg) rotateZ(0deg); }
+}
+
+@keyframes carFront {
+  0% { opacity: 0; transform: translateZ(0) scale(.42) rotateY(-8deg); }
+  12% { opacity: 1; transform: translateZ(0) scale(.56) rotateY(0deg); }
+  27% { opacity: 1; transform: translateZ(0) scale(.73) rotateY(0deg); }
+  72% { opacity: 1; transform: translateZ(0) scale(5.8) translateY(10px) rotateY(0deg); }
+  100% { opacity: 0; transform: translateZ(0) scaleX(13) scaleY(.18) translateY(10px) rotateY(0deg); filter: blur(2px); }
+}
+
+@keyframes streak {
+  0% { opacity: 0; transform: scaleX(0) scaleY(.7); }
+  28% { opacity: .72; transform: scaleX(1) scaleY(.7); }
+  100% { opacity: 0; transform: scaleX(1.7) scaleY(1.8); }
+}
+
+@keyframes roadLine {
+  0% { opacity: 0; transform: scaleX(0); }
+  18% { opacity: .45; transform: scaleX(1); }
+  100% { opacity: 0; transform: scaleX(1); }
+}
+
+@keyframes brand {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.92); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes wordmark {
+  0% { transform: scaleX(.42); letter-spacing: .34em; padding-left: .34em; }
+  100% { transform: scaleX(1); letter-spacing: .08em; padding-left: .08em; }
+}
+
+@keyframes rule {
+  0% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+@keyframes tagline {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: .62; transform: translateY(0); }
+}
+
+@keyframes introExit {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 @media (max-width: 700px) {
-  .intro__car {
-    width: 82vw;
-  }
+  .intro__car { width: 82vw; }
+  .intro__car--side { margin-left: -41vw; margin-top: -20vw; }
+  .intro__car--front { width: 80vw; margin-left: -40vw; margin-top: -18vw; }
+  .intro__road-line { left: 5%; right: 5%; top: 73%; }
+  .intro__tagline { letter-spacing: .16em; padding-left: .16em; }
+  .intro__skip { right: 18px; bottom: 16px; }
+}
 
-  .intro__car--side {
-    margin-left: -41vw;
-    margin-top: -20vw;
-  }
-
-  .intro__car--front {
-    width: 80vw;
-    margin-left: -40vw;
-    margin-top: -18vw;
-  }
-
-  .intro__road-line {
-    left: 5%;
-    right: 5%;
-    top: 73%;
-  }
-
+@media (prefers-reduced-motion: reduce) {
+  .intro__car,
+  .intro__road-line,
+  .intro__streak,
+  .intro__brand,
+  .intro__wordmark,
+  .intro__rule,
   .intro__tagline {
-    letter-spacing: 0.16em;
-    padding-left: 0.16em;
+    animation: none !important;
   }
 
-  .intro__skip {
-    right: 18px;
-    bottom: 16px;
-  }
+  .intro__brand { opacity: 1; transform: translate(-50%, -50%); }
+  .intro__wordmark { transform: none; letter-spacing: .08em; padding-left: .08em; }
+  .intro__rule { transform: none; }
+  .intro__tagline { opacity: .62; transform: none; }
 }
 </style>
