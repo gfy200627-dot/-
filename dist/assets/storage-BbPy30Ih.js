@@ -1,1 +1,0 @@
-function e(r,t){try{const a=localStorage.getItem(r);return a?JSON.parse(a):t}catch{return t}}function o(r,t){try{localStorage.setItem(r,JSON.stringify(t))}catch{}}const i={favorites:"autoinsight_favorites",history:"autoinsight_history",compare:"autoinsight_compare",sidebarCollapsed:"autoinsight_sidebar_collapsed"};export{i as S,e as r,o as w};
